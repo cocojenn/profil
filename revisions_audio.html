@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Révision – Mes informations personnelles</title>
+<style>
+  :root{
+    --tu:#e8742c;
+    --vous:#1e7a6f;
+    --bg:#fdf8f1;
+    --card:#ffffff;
+    --ink:#2b2b2b;
+    --ok:#3a9d4f;
+    --bad:#d6483f;
+    --accent:#f1c40f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+    font-size:18px;
+  }
+  header{
+    background:linear-gradient(120deg,#1e7a6f,#2fa192);
+    color:white;
+    padding:28px 20px;
+    text-align:center;
+  }
+  header h1{margin:0 0 6px;font-size:1.7em;}
+  header p{margin:0;font-size:1em;opacity:.95;}
+  .top-controls{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:16px;
+  }
+  .pill-btn{
+    background:white;
+    color:#1e7a6f;
+    border:none;
+    border-radius:30px;
+    padding:10px 18px;
+    font-size:1em;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 2px 6px rgba(0,0,0,.15);
+  }
+  .pill-btn.active{background:var(--accent);color:#3a2a00;}
+  main{max-width:880px;margin:0 auto;padding:20px 16px 60px;}
+  section{
+    background:var(--card);
+    border-radius:16px;
+    padding:22px 20px;
+    margin:24px 0;
+    box-shadow:0 2px 10px rgba(0,0,0,.06);
+  }
+  .step-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .step-num{
+    background:#1e7a6f;
+    color:white;
+    width:38px;height:38px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;
+    flex-shrink:0;
+  }
+  .step-title h2{margin:0;font-size:1.3em;}
+  .step-desc{margin:0 0 16px 50px;color:#555;font-size:.95em;}
+  .qa-pair{
+    border:2px solid #eee;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:14px;
+    background:#fffdf9;
+  }
+  .qa-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:6px 0;
+  }
+  .tag{
+    font-size:.75em;
+    font-weight:700;
+    color:white;
+    border-radius:6px;
+    padding:3px 9px;
+    flex-shrink:0;
+  }
+  .tag.tu{background:var(--tu);}
+  .tag.vous{background:var(--vous);}
+  .qa-text{font-weight:600;flex:1;min-width:160px;}
+  .speak-btn{
+    border:none;
+    background:#f1f1f1;
+    border-radius:50%;
+    width:42px;height:42px;
+    font-size:1.2em;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .speak-btn:hover{background:#e2e2e2;}
+  .speak-btn:active{transform:scale(.92);}
+  .answer-line{
+    margin-top:8px;
+    padding:10px 12px;
+    background:#f4f9f0;
+    border-left:4px solid var(--ok);
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  table{width:100%;border-collapse:collapse;margin-top:8px;}
+  td,th{border:1px solid #e3e3e3;padding:10px;text-align:left;}
+  th{background:#f4f1ea;width:38%;}
+  td input{
+    width:100%;
+    border:none;
+    background:transparent;
+    font-size:1em;
+    padding:6px 4px;
+    border-bottom:2px dashed #ccc;
+  }
+  td input:focus{outline:none;border-bottom:2px solid var(--vous);}
+  .row-audio{display:flex;align-items:center;gap:8px;}
+
+  /* matching game */
+  .match-zone{display:flex;gap:18px;flex-wrap:wrap;}
+  .match-col{flex:1;min-width:240px;}
+  .match-col h3{font-size:1em;color:#555;margin:0 0 8px;}
+  .match-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#fff;
+    border:2px solid #ddd;
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:10px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .match-item span.txt{flex:1;}
+  .match-item.selected{border-color:var(--accent);background:#fffbe8;}
+  .match-item.correct{border-color:var(--ok);background:#eafaee;cursor:default;}
+  .match-item.wrong{border-color:var(--bad);background:#fdeceb;}
+  #match-feedback{margin-top:10px;font-weight:600;min-height:24px;}
+
+  /* open questions */
+  .open-q{
+    border:2px solid #eee;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:16px;
+  }
+  .starter-box{
+    margin-top:8px;
+    background:#fff7e6;
+    border-left:4px solid var(--accent);
+    border-radius:8px;
+    padding:8px 12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-style:italic;
+  }
+  textarea{
+    width:100%;
+    margin-top:10px;
+    border:2px solid #e0e0e0;
+    border-radius:8px;
+    padding:10px;
+    font-size:1em;
+    font-family:inherit;
+    min-height:50px;
+    resize:vertical;
+  }
+  .reveal-btn{
+    margin-top:8px;
+    background:none;
+    border:2px solid var(--vous);
+    color:var(--vous);
+    border-radius:20px;
+    padding:6px 14px;
+    cursor:pointer;
+    font-size:.9em;
+  }
+  .model-answer{
+    display:none;
+    margin-top:8px;
+    padding:10px 12px;
+    background:#eef7f6;
+    border-radius:8px;
+    color:#1e7a6f;
+  }
+  footer{text-align:center;padding:20px;color:#999;font-size:.85em;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🇫🇷 Révision – Mes informations personnelles</h1>
+  <p>Écoute, observe, puis réponds. Tu peux réécouter autant de fois que tu veux !</p>
+  <div class="top-controls">
+    <button class="pill-btn" id="introBtn">🔊 Écouter les instructions</button>
+    <button class="pill-btn" id="speedBtn">🐢 Vitesse lente : OFF</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ÉTAPE 1 -->
+  <section>
+    <div class="step-title"><div class="step-num">1</div><h2>Écoute et observe</h2></div>
+    <p class="step-desc">Clique sur 🔊 pour écouter chaque question. Remarque : il y a toujours deux façons de demander la même chose — à un ami (<span style="color:var(--tu);font-weight:700">tu</span>) ou à quelqu'un que tu connais moins (<span style="color:var(--vous);font-weight:700">vous</span>). C'est la même question !</p>
+
+    <div id="step1-list"></div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section>
+    <div class="step-title"><div class="step-num">2</div><h2>Relie la question à la bonne réponse</h2></div>
+    <p class="step-desc">Écoute la question, écoute les réponses, puis clique sur la question et ensuite sur la réponse qui va avec.</p>
+    <div class="match-zone">
+      <div class="match-col">
+        <h3>QUESTIONS</h3>
+        <div id="match-questions"></div>
+      </div>
+      <div class="match-col">
+        <h3>RÉPONSES (exemple de Coraline)</h3>
+        <div id="match-answers"></div>
+      </div>
+    </div>
+    <div id="match-feedback"></div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section>
+    <div class="step-title"><div class="step-num">3</div><h2>Remplis ton tableau</h2></div>
+    <p class="step-desc">Écoute chaque question, puis écris TA réponse dans la case.</p>
+    <table id="info-table"></table>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section>
+    <div class="step-title"><div class="step-num">4</div><h2>Réponds avec une phrase complète</h2></div>
+    <p class="step-desc">Écoute la question, puis écoute le début de la phrase pour t'aider à commencer. Écris ta phrase complète. Tu peux aussi écouter l'exemple de Coraline si tu veux un modèle.</p>
+    <div id="step4-list"></div>
+  </section>
+
+</main>
+
+<footer>Fait avec ❤️ pour t'aider à apprendre à ton rythme.</footer>
+
+<script>
+/* ---------- SPEECH ---------- */
+let slow = false;
+let frVoice = null;
+
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  // priorité à la voix Google (plus naturelle), puis n'importe quelle voix française
+  frVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('fr'))
+    || voices.find(v => v.lang === 'fr-FR')
+    || voices.find(v => v.lang && v.lang.startsWith('fr'))
+    || null;
+}
+speechSynthesis.onvoiceschanged = pickVoice;
+pickVoice();
+
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert("La synthèse vocale n'est pas disponible sur ce navigateur.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'fr-FR';
+  if(frVoice) u.voice = frVoice;
+  u.rate = slow ? 0.65 : 0.95;
+  u.pitch = 1;
+  speechSynthesis.speak(u);
+}
+
+document.getElementById('speedBtn').addEventListener('click', function(){
+  slow = !slow;
+  this.classList.toggle('active', slow);
+  this.textContent = slow ? '🐢 Vitesse lente : ON' : '🐢 Vitesse lente : OFF';
+});
+
+document.getElementById('introBtn').addEventListener('click', function(){
+  speak("Bonjour ! Sur cette page, clique sur les petits haut-parleurs pour écouter les questions en français. Tu peux écouter plusieurs fois, c'est normal et ça aide à apprendre. Ensuite, écris tes réponses dans les cases. Bon courage, tu es capable !");
+});
+
+function speakBtn(text){
+  const b = document.createElement('button');
+  b.className = 'speak-btn';
+  b.title = 'Écouter';
+  b.textContent = '🔊';
+  b.addEventListener('click', () => speak(text));
+  return b;
+}
+
+/* ---------- DATA ---------- */
+const pairs = [
+  {
+    tu: "Tu t'appelles comment ?",
+    vous: "Comment vous vous appelez ?",
+    answer: "Je m'appelle Coraline Mercier.",
+    starter: "Je m'appelle...",
+    field: "Nom et prénom"
+  },
+  {
+    tu: "Tu viens d'où ?",
+    vous: "Vous venez d'où ?",
+    answer: "Je suis française et vietnamienne.",
+    starter: "Je viens de... / Je suis...",
+    field: "Origine(s)"
+  },
+  {
+    tu: "Quelle est ta date de naissance ?",
+    vous: "Quelle est votre date de naissance ?",
+    answer: "Je suis née le 9 septembre 1995.",
+    starter: "Je suis né(e) le...",
+    starterSpeak: "Je suis née le...",
+    field: "Date de naissance"
+  },
+  {
+    tu: "Quelle est ton adresse ?",
+    vous: "Quelle est votre adresse ?",
+    answer: "J'habite à la rue du Musée 5, à Neuchâtel.",
+    starter: "J'habite à...",
+    field: "Adresse"
+  },
+  {
+    tu: "Quel est ton numéro de natel ?",
+    vous: "Quel est votre numéro de natel ?",
+    answer: "Mon numéro est le 078 401 18 15.",
+    answerSpeak: "Mon numéro est le zéro septante-huit, quatre cent un, dix-huit, quinze.",
+    starter: "Mon numéro est le...",
+    field: "Numéro de natel"
+  },
+  {
+    tu: "Quelle est ton adresse mail ?",
+    vous: "Quelle est votre adresse mail ?",
+    answer: "C'est coraline.mercier@trainer.miduca.ch.",
+    answerSpeak: "C'est coraline point mercier, at, trainer point miduca point ch.",
+    starter: "Mon adresse mail est...",
+    field: "Adresse mail"
+  },
+  {
+    tu: "Tu aimes quoi ? Tu détestes quoi ?",
+    vous: "Vous aimez quoi ? Vous détestez quoi ?",
+    answer: "J'aime le café et je déteste la randonnée.",
+    starter: "J'aime... et je déteste...",
+    field: "Aime / déteste"
+  }
+];
+
+/* ---------- ÉTAPE 1 : liste tu/vous ---------- */
+const step1 = document.getElementById('step1-list');
+pairs.forEach(p => {
+  const wrap = document.createElement('div');
+  wrap.className = 'qa-pair';
+
+  const rowVous = document.createElement('div');
+  rowVous.className = 'qa-row';
+  const tagVous = document.createElement('span'); tagVous.className='tag vous'; tagVous.textContent='VOUS';
+  const txtVous = document.createElement('span'); txtVous.className='qa-text'; txtVous.textContent = p.vous;
+  rowVous.append(tagVous, txtVous, speakBtn(p.vous));
+
+  const rowTu = document.createElement('div');
+  rowTu.className = 'qa-row';
+  const tagTu = document.createElement('span'); tagTu.className='tag tu'; tagTu.textContent='= TU';
+  const txtTu = document.createElement('span'); txtTu.className='qa-text'; txtTu.textContent = p.tu;
+  rowTu.append(tagTu, txtTu, speakBtn(p.tu));
+
+  wrap.append(rowVous, rowTu);
+  step1.appendChild(wrap);
+});
+
+/* ---------- ÉTAPE 2 : jeu de correspondance ---------- */
+const qCol = document.getElementById('match-questions');
+const aCol = document.getElementById('match-answers');
+const feedback = document.getElementById('match-feedback');
+
+// shuffle answers for the game
+const shuffledPairs = [...pairs];
+const answerOrder = [...pairs].sort(() => Math.random() - 0.5);
+
+let selectedQ = null;
+const matchedIds = new Set();
+
+pairs.forEach((p, i) => {
+  const item = document.createElement('div');
+  item.className = 'match-item';
+  item.dataset.id = i;
+  const span = document.createElement('span'); span.className='txt'; span.textContent = p.vous;
+  item.append(span, speakBtn(p.vous));
+  item.addEventListener('click', (e) => {
+    if(e.target.closest('.speak-btn')) return;
+    if(item.classList.contains('correct')) return;
+    document.querySelectorAll('#match-questions .match-item').forEach(el => el.classList.remove('selected'));
+    item.classList.add('selected');
+    selectedQ = i;
+  });
+  qCol.appendChild(item);
+});
+
+answerOrder.forEach((p) => {
+  const realIndex = pairs.indexOf(p);
+  const item = document.createElement('div');
+  item.className = 'match-item';
+  item.dataset.id = realIndex;
+  const span = document.createElement('span'); span.className='txt'; span.textContent = p.answer;
+  item.append(span, speakBtn(p.answerSpeak || p.answer));
+  item.addEventListener('click', (e) => {
+    if(e.target.closest('.speak-btn')) return;
+    if(item.classList.contains('correct')) return;
+    if(selectedQ === null){
+      feedback.textContent = "👉 Clique d'abord sur une question.";
+      feedback.style.color = '#888';
+      return;
+    }
+    const qItem = document.querySelector(`#match-questions .match-item[data-id="${selectedQ}"]`);
+    if(parseInt(item.dataset.id) === selectedQ){
+      item.classList.add('correct');
+      qItem.classList.add('correct');
+      qItem.classList.remove('selected');
+      feedback.textContent = "✅ Bravo, c'est la bonne réponse !";
+      feedback.style.color = 'var(--ok)';
+      matchedIds.add(selectedQ);
+      selectedQ = null;
+      if(matchedIds.size === pairs.length){
+        feedback.textContent = "🎉 Parfait, tu as relié toutes les questions !";
+      }
+    } else {
+      item.classList.add('wrong');
+      feedback.textContent = "❌ Essaie encore.";
+      feedback.style.color = 'var(--bad)';
+      setTimeout(() => item.classList.remove('wrong'), 600);
+    }
+  });
+  aCol.appendChild(item);
+});
+
+/* ---------- ÉTAPE 3 : tableau personnel ---------- */
+const table = document.getElementById('info-table');
+pairs.forEach(p => {
+  const tr = document.createElement('tr');
+  const th = document.createElement('th');
+  const rowAudio = document.createElement('div');
+  rowAudio.className = 'row-audio';
+  const label = document.createElement('span'); label.textContent = p.field;
+  rowAudio.append(speakBtn(p.vous), label);
+  th.appendChild(rowAudio);
+
+  const td = document.createElement('td');
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Écris ta réponse ici...';
+  td.appendChild(input);
+
+  tr.append(th, td);
+  table.appendChild(tr);
+});
+
+/* ---------- ÉTAPE 4 : phrases complètes ---------- */
+const step4 = document.getElementById('step4-list');
+pairs.forEach((p, i) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'open-q';
+
+  const qRow = document.createElement('div');
+  qRow.className = 'qa-row';
+  const tag = document.createElement('span'); tag.className='tag vous'; tag.textContent='QUESTION';
+  const txt = document.createElement('span'); txt.className='qa-text'; txt.textContent = p.vous;
+  qRow.append(tag, txt, speakBtn(p.vous));
+
+  const starterBox = document.createElement('div');
+  starterBox.className = 'starter-box';
+  const starterTxt = document.createElement('span'); starterTxt.textContent = '👂 ' + p.starter;
+  starterBox.append(starterTxt, speakBtn(p.starterSpeak || p.starter));
+
+  const textarea = document.createElement('textarea');
+  textarea.placeholder = 'Écris ta phrase complète ici...';
+
+  const revealBtn = document.createElement('button');
+  revealBtn.className = 'reveal-btn';
+  revealBtn.textContent = '🔊 Écouter un exemple (Coraline)';
+
+  const modelDiv = document.createElement('div');
+  modelDiv.className = 'model-answer';
+  modelDiv.textContent = p.answer;
+
+  revealBtn.addEventListener('click', () => {
+    modelDiv.style.display = 'block';
+    speak(p.answerSpeak || p.answer);
+  });
+
+  wrap.append(qRow, starterBox, textarea, revealBtn, modelDiv);
+  step4.appendChild(wrap);
+});
+</script>
+</body>
+</html>
